@@ -6,14 +6,15 @@ import {
 	Image,
 	TouchableHighlight,
 } from 'react-native';
-import Status from './components/Status';
-import MessageList from './components/MessageList';
-import Toolbar from './components/Toolbar';
 import {
 	createImageMessage,
 	createLocationMessage,
 	createTextMessage,
 } from './utils/MessageUtils';
+import Status from './components/Status';
+import MessageList from './components/MessageList';
+import Toolbar from './components/Toolbar';
+import ImageGrid from './components/ImageGrid';
 
 export default function App() {
 	const home = {
@@ -44,7 +45,18 @@ export default function App() {
 	};
 
 	const handlePressToolbarLocation = () => {
-		// ...
+		// if using react-native-cli, Info.plist must also be
+		// modified to enable location permissions!
+		navigator.geolocation.getCurrentPosition((position) => {
+			const {
+				coords: { latitude, longitude },
+			} = position;
+
+			setMessages([
+				createLocationMessage({ latitude, longitude }),
+				...messages,
+			]);
+		});
 	};
 
 	const handleChangeFocus = (isFocused) => {
@@ -79,6 +91,7 @@ export default function App() {
 				);
 				break;
 			case 'image':
+				setIsInputFocused(false); // just the keyboard is showing
 				setFullscreenImageId(id);
 
 				break;
@@ -123,8 +136,14 @@ export default function App() {
 		);
 	};
 
+	const handlePressImage = (uri) => {
+		setMessages([createImageMessage(uri), ...messages]);
+	};
+
 	const renderInputMethodEditor = () => (
-		<View style={styles.inputMethodEditor}></View>
+		<View style={styles.inputMethodEditor}>
+			<ImageGrid onPressImage={handlePressImage} />
+		</View>
 	);
 
 	const renderToolbar = () => (
