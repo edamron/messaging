@@ -15,6 +15,11 @@ import Status from './components/Status';
 import MessageList from './components/MessageList';
 import Toolbar from './components/Toolbar';
 import ImageGrid from './components/ImageGrid';
+import KeyboardState from './components/KeyboardState';
+import MeasureLayout from './components/MeasureLayout';
+import MessagingContainer, {
+	INPUT_METHOD,
+} from './components/MessagingContainer';
 
 export default function App() {
 	const home = {
@@ -28,6 +33,7 @@ export default function App() {
 
 	const [fullscreenImageId, setFullscreenImageId] = useState(null);
 	const [isInputFocused, setIsInputFocused] = useState(false);
+	const [inputMethod, setInputMethod] = useState(INPUT_METHOD.NONE);
 	const [messages, setMessages] = useState([
 		createImageMessage('https://unsplash.it/300/300'),
 		createLocationMessage(dad),
@@ -40,8 +46,13 @@ export default function App() {
 		setFullscreenImageId(null);
 	};
 
+	const handleChangeInputMethod = (newInputMethod) => {
+		setInputMethod(newInputMethod);
+	};
+
 	const handlePressToolbarCamera = () => {
-		// ...
+		setIsInputFocused(false);
+		setInputMethod(INPUT_METHOD.CUSTOM);
 	};
 
 	const handlePressToolbarLocation = () => {
@@ -161,9 +172,25 @@ export default function App() {
 	return (
 		<View style={styles.container}>
 			<Status />
-			{renderMessageList()}
-			{renderToolbar()}
-			{renderInputMethodEditor()}
+			<MeasureLayout>
+				{(layout) => (
+					<KeyboardState layout={layout}>
+						{(keyboardInfo) => (
+							<MessagingContainer
+								{...keyboardInfo}
+								inputMethod={inputMethod}
+								onChangeInputMethod={handleChangeInputMethod}
+								renderInputMethodEditor={
+									renderInputMethodEditor
+								}
+							>
+								{renderMessageList()}
+								{renderToolbar()}
+							</MessagingContainer>
+						)}
+					</KeyboardState>
+				)}
+			</MeasureLayout>
 			{renderFullscreenImage()}
 		</View>
 	);
