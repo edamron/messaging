@@ -46,7 +46,7 @@ const MessagingContainer = ({
 		});
 		return ref.current;
 	};
-	const prevKeyboardVisible = usePrevious(keyboardVisible);
+    const prevKeyboardVisible = usePrevious(keyboardVisible);
 
 	// update the UI when they keyboard changes visibility
 	useEffect(() => {
